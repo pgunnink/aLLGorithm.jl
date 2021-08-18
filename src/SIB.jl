@@ -100,12 +100,12 @@ end
 end
 
 @fastmath @muladd function StochasticDiffEq.perform_step!(integrator, cache::SIBCache)
-    @unpack t, dt, u, f, W = integrator
+    @unpack t, dt, u, f, W, p = integrator
     # @unpack M, Mx, My, Mz, a, Acache, N, up  = cache
     @unpack Acache, N, up, αkbT, detM, detMx, detMy, detMz = cache
 
     # do the predictor step:
-    f(Acache, u, t)
+    f(Acache, u, p, t)
     @. Acache = .5dt * (Acache + W.dW * √(2αkbT))
     
     fdet(x11, x21, x31, x12, x22, x32, x13, x23, x33) = x11 * (x22 * x33 - x23 * x32) - x12 * (x21 * x33 - x23 * x31) + x13 * (x21 * x32 - x22 * x31)
@@ -127,7 +127,7 @@ end
 
     # # and the final step:
     @. up = .5 * ( up + u)
-    f(Acache,  up, t + .5dt) 
+    f(Acache,  up, p, t + .5dt) 
     @. Acache = .5dt * (Acache + W.dW * √(2αkbT))
 
     @inbounds for i in 1:N
