@@ -35,7 +35,7 @@ function LLGProblem(A, u0, tspan, p = NullParameters() ; αkbT = 0.,
     if αkbT != 0.
         g = x -> 1
         f = convert(SciMLBase.SDEFunction{true}, A,  g)
-        noise = StochasticDiffEq.WienerProcess(0.0, 0.0, 0.0)
+        noise = StochasticDiffEq.WienerProcess(0.0, zeros(size(u0)), 0.0)
         StochasticLLGProblem{typeof(u0),typeof(_tspan),typeof(p),typeof(noise),typeof(kwargs),typeof(nothing)}(f, g, αkbT, u0, tspan, p, noise_rate_prototype, noise, kwargs, seed)
     else
         f = convert(SciMLBase.ODEFunction{true}, A)
@@ -102,7 +102,7 @@ recompile::Type{Val{recompile_flag}} = Val{true};
     kwargs...) where recompile_flag
     Acache = similar(prob.u0)
 
-    fA = ODEFunction(llg_f(prob.f, Acache), analytic=prob.f.analytic) # make sure to copy over the analytic part
+    fA = ODEFunction(llg_f(prob.f, Acache), analytic = prob.f.analytic) # make sure to copy over the analytic part
     prob2 = ODEProblem(fA, prob.u0, prob.tspan, prob.p; prob.kwargs)
     
     norm_cache = zeros(Float64, size(prob.u0)[1])
@@ -112,11 +112,11 @@ recompile::Type{Val{recompile_flag}} = Val{true};
         # the last step will not be normalized, so add it
         append!(norm_times, prob.tspan[2])
     end
-    cb = PresetTimeCallback(norm_times,affect!)
+    cb = PresetTimeCallback(norm_times, affect!)
     if haskey(kwargs, :callback) 
         cb = CallBackSet(kwargs[:callback], cb)
     end
-    integrator = DiffEqBase.__init(prob2, alg, timeseries, ts, ks, recompile;callback=cb, kwargs...) #callback is handled by __init, so this should not give problems!
+    integrator = DiffEqBase.__init(prob2, alg, timeseries, ts, ks, recompile;callback = cb, kwargs...) # callback is handled by __init, so this should not give problems!
     
     
     solve!(integrator)
