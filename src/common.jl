@@ -35,7 +35,7 @@ function LLGProblem(A, u0, tspan, p = NullParameters() ; αkbT = 0.,
     if αkbT != 0.
         g = x -> 1
         f = convert(SciMLBase.SDEFunction{true}, A,  g)
-        noise = StochasticDiffEq.WienerProcess(0.0, zeros(size(u0)), 0.0)
+        noise = StochasticDiffEq.WienerProcess(0.0, zeros(size(u0)), 0.0, save_everystep = false)
         StochasticLLGProblem{typeof(u0),typeof(_tspan),typeof(p),typeof(noise),typeof(kwargs),typeof(nothing)}(f, g, αkbT, u0, tspan, p, noise_rate_prototype, noise, kwargs, seed)
     else
         f = convert(SciMLBase.ODEFunction{true}, A)
