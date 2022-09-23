@@ -1,9 +1,33 @@
-struct OrdinaryLLGProblem{uType,tType,P,K} <: AbstractODEProblem{uType,tType,true}
-    f::Function
+struct OrdinaryLLGProblem{F,uType,tType,P,K} <: AbstractODEProblem{uType,tType,true}
+    f::F
     u0::uType
     tspan::tType
     p::P
     kwargs::K
+
+
+    #     function OrdinaryLLGProblem(f::AbstractODEFunction,
+    #         u0, tspan, p=NullParameters();
+    #         kwargs...)
+    #         _tspan = promote_tspan(tspan)
+    #         new{typeof(f),
+    #             typeof(u0),
+    #             typeof(_tspan),
+    #             typeof(p),
+    #             typeof(kwargs)
+    #         }(f, u0, _tspan, p, kwargs)
+    #     end
+end
+@add_kwonly function OrdinaryLLGProblem{true}(f::AbstractODEFunction,
+    u0, tspan, p=NullParameters();
+    kwargs...)
+    _tspan = promote_tspan(tspan)
+    OrdinaryLLGProblem{typeof(f),
+        typeof(u0),
+        typeof(_tspan),
+        typeof(p),
+        typeof(kwargs)
+    }(f, u0, _tspan, p, kwargs)
 end
 
 struct StochasticLLGProblem{uType,tType,P,NP,K,ND} <: AbstractSDEProblem{uType,tType,true,ND}
@@ -43,11 +67,11 @@ function LLGProblem(A, u0, tspan, p=NullParameters(); αkbT=0.0,
         f = SciMLBase.ODEFunction{true,SciMLBase.DEFAULT_SPECIALIZATION}(A)
 
         # f = convert(SciMLBase.ODEFunction{true}, A)
-        OrdinaryLLGProblem{typeof(u0),typeof(_tspan),typeof(p),typeof(kwargs)}(f, u0, tspan, p, kwargs)
+        OrdinaryLLGProblem{typeof(f),typeof(u0),typeof(_tspan),typeof(p),typeof(kwargs)}(f, u0, tspan, p, kwargs)
     end
 
 end
-
+# SciMLBase.remaker_of(::OrdinaryLLGProblem) = OrdinaryLLGProblem
 abstract type OrdinaryLLGAlgorithm <: OrdinaryDiffEqAlgorithm end
 abstract type StochasticLLGAlgorithm <: StochasticDiffEqAlgorithm end
 
