@@ -1,9 +1,9 @@
 using aLLGorithm
 function single_spin_problem()
-    γ = .2
-    α = .01
+    γ = 0.2
+    α = 0.01
     function A!(Acache, u, p, t)
-        Acache[1] = - u[2] * γ * α
+        Acache[1] = -u[2] * γ * α
         Acache[2] = u[1] * γ * α
         Acache[3] = -γ
     end
@@ -15,6 +15,6 @@ function single_spin_problem()
         ny = sin(ϕ) * √(1 - nz^2)
         [nx ny nz]
     end
-    f = ODEFunction(A!, analytic = analytical_solution)
-    LLGProblem(f, [1. 0. 0.], (0., 100.))
+    f = ODEFunction(A!, analytic=analytical_solution)
+    LLGProblem(f, [1.0 0.0 0.0], (0.0, 100.0))
 end
