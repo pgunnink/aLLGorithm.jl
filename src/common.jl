@@ -57,7 +57,7 @@ function LLGProblem(A, u0, tspan, p=NullParameters(); αkbT=0.0,
     _tspan = promote_tspan(tspan)
 
     if αkbT != 0.0
-        g = x -> 1
+        g(du,u,p,t) = 1
         f = SciMLBase.SDEFunction{true}(A, g)
 
         # f = convert(SciMLBase.SDEFunction{true}, A, g)
