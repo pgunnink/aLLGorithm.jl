@@ -23,4 +23,8 @@ end
 end
 
 
+@testset "ODE solve" begin
+    solve(LLGProblem(runtimefunction(), [1.0 2.0 3.0], (0.0, 10.0), αkbT=0.001), SIBStochastic(), dt=0.1)
+end
+
 
